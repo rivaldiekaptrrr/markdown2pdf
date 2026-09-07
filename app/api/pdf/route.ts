@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildDocumentHtml } from '@/lib/pdf/template';
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 import type { PaperSettings } from '@/components/pdf/PdfSettings';
 
 export const runtime = 'nodejs';
@@ -13,6 +14,32 @@ const VALID_ORIENTATIONS = ['portrait', 'landscape'] as const;
 const MAX_MARKDOWN_SIZE = 2 * 1024 * 1024;
 
 export async function POST(req: NextRequest) {
+  // Rate limiting check (10 exports per 60s per IP)
+  const clientIp = getClientIp(req.headers);
+  const rateLimit = checkRateLimit(clientIp, { limit: 10, windowSeconds: 60 });
+
+  const rateLimitHeaders = {
+    'X-RateLimit-Limit': String(rateLimit.limit),
+    'X-RateLimit-Remaining': String(rateLimit.remaining),
+    'X-RateLimit-Reset': String(rateLimit.resetSeconds),
+  };
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      {
+        error: `Terlalu banyak permintaan export PDF. Silakan tunggu ${rateLimit.resetSeconds} detik lagi.`,
+        retryAfter: rateLimit.resetSeconds,
+      },
+      {
+        status: 429,
+        headers: {
+          ...rateLimitHeaders,
+          'Retry-After': String(rateLimit.resetSeconds),
+        },
+      }
+    );
+  }
+
   let markdown: string;
   let settings: PaperSettings;
 
@@ -21,22 +48,23 @@ export async function POST(req: NextRequest) {
     markdown = body.markdown;
     settings = body.settings;
   } catch {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400, headers: rateLimitHeaders });
   }
 
   // Validation
   if (typeof markdown !== 'string' || !markdown.trim()) {
-    return NextResponse.json({ error: 'markdown is required' }, { status: 400 });
+    return NextResponse.json({ error: 'markdown is required' }, { status: 400, headers: rateLimitHeaders });
   }
   if (Buffer.byteLength(markdown, 'utf8') > MAX_MARKDOWN_SIZE) {
-    return NextResponse.json({ error: 'Markdown too large (max 2 MB)' }, { status: 400 });
+    return NextResponse.json({ error: 'Markdown too large (max 2 MB)' }, { status: 400, headers: rateLimitHeaders });
   }
   if (settings.format && !VALID_FORMATS.includes(settings.format)) {
-    return NextResponse.json({ error: 'Invalid format' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid format' }, { status: 400, headers: rateLimitHeaders });
   }
   if (settings.orientation && !VALID_ORIENTATIONS.includes(settings.orientation)) {
-    return NextResponse.json({ error: 'Invalid orientation' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid orientation' }, { status: 400, headers: rateLimitHeaders });
   }
+
 
   try {
     // Dynamically import puppeteer to avoid edge runtime issues
@@ -103,6 +131,7 @@ export async function POST(req: NextRequest) {
           'Content-Type': 'application/pdf',
           'Content-Disposition': 'attachment; filename="document.pdf"',
           'Content-Length': String(buffer.length),
+          ...rateLimitHeaders,
         },
       });
     } catch (innerErr) {
@@ -113,7 +142,7 @@ export async function POST(req: NextRequest) {
     console.error('[PDF API] Error:', err);
     return NextResponse.json(
       { error: 'PDF generation failed. Please try again.' },
-      { status: 500 }
+      { status: 500, headers: rateLimitHeaders }
     );
   }
 }
