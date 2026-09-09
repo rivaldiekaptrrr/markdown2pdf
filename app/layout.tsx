@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   description:
     'Free online Markdown to PDF converter with live preview, Mermaid.js diagrams, KaTeX math formulas, syntax highlighting, and custom page layouts.',
   applicationName: 'Markdown2PDF',
-  authors: [{ name: 'Markdown2PDF Team' }],
+  authors: [{ name: 'Rivaldi Eka Putra', url: 'https://github.com/rivaldiekaptrrr' }],
   generator: 'Next.js',
   keywords: [
     'Markdown to PDF',
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     'Academic Paper Markdown',
     'export Markdown as PDF',
   ],
-  creator: 'Markdown2PDF',
+  creator: 'Rivaldi Eka Putra',
   publisher: 'Markdown2PDF',
   formatDetection: {
     email: false,
@@ -112,6 +112,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               url: 'https://markdown2pdf.my.id',
               description:
                 'Free online Markdown to PDF converter with live preview, Mermaid.js diagrams, KaTeX math expressions, syntax highlighting, and custom page formatting.',
+              author: {
+                '@type': 'Person',
+                name: 'Rivaldi Eka Putra',
+                url: 'https://github.com/rivaldiekaptrrr',
+                sameAs: [
+                  'https://github.com/rivaldiekaptrrr',
+                  'https://www.linkedin.com/in/rivaldiekaputr',
+                ],
+              },
               featureList: [
                 'Real-Time Live Preview with Scroll Sync',
                 'Mermaid.js Diagram Rendering (Flowchart, Sequence, Gantt)',
