@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: '%s | Markdown2PDF',
   },
   description:
-    'Free online Markdown to PDF converter with live preview, Mermaid.js diagrams, KaTeX math formulas, syntax highlighting, scroll sync, and custom page formatting. No sign-up required.',
+    'Free online Markdown to PDF converter with live preview, Mermaid.js diagrams, KaTeX math formulas, syntax highlighting, and custom page layouts.',
   applicationName: 'Markdown2PDF',
   authors: [{ name: 'Markdown2PDF Team' }],
   generator: 'Next.js',
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Markdown2PDF — Free Online Markdown to PDF Converter',
     description:
-      'Transform your Markdown into publication-grade PDFs in real time with Mermaid diagrams, LaTeX math, code highlighting, and custom paper layouts. Free, no sign-up.',
+      'Convert Markdown to PDF online for free. Real-time preview, Mermaid diagrams, KaTeX math, syntax highlighting & custom CSS.',
     url: APP_URL,
     siteName: 'Markdown2PDF',
     locale: 'en_US',
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Markdown2PDF — Free Online Markdown to PDF Converter',
     description:
-      'Transform your Markdown into publication-grade PDFs in real time with Mermaid diagrams, LaTeX math, code highlighting, and custom paper layouts. Free, no sign-up.',
+      'Convert Markdown to PDF online for free. Real-time preview, Mermaid diagrams, KaTeX math, syntax highlighting & custom CSS.',
   },
   robots: {
     index: true,

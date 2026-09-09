@@ -93,26 +93,44 @@ export default async function Image() {
             justifyContent: 'center',
             gap: '16px',
             marginTop: '20px',
+            marginBottom: '32px',
           }}
         >
-          {['Mermaid Diagrams', 'KaTeX Math', 'Scroll Sync', 'Dark & Light Mode', 'Custom Paper CSS'].map(
-            (tag) => (
-              <div
-                key={tag}
-                style={{
-                  padding: '8px 18px',
-                  borderRadius: '10px',
-                  background: 'rgba(255, 255, 255, 0.06)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  color: '#cbd5e1',
-                  fontSize: 18,
-                  fontWeight: 500,
-                }}
-              >
-                {tag}
-              </div>
-            )
-          )}
+          {['Mermaid Diagrams', 'KaTeX Math', 'Scroll Sync', 'Custom Layouts'].map((tag) => (
+            <div
+              key={tag}
+              style={{
+                padding: '8px 18px',
+                borderRadius: '10px',
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                color: '#cbd5e1',
+                fontSize: 18,
+                fontWeight: 500,
+              }}
+            >
+              {tag}
+            </div>
+          ))}
+        </div>
+
+        {/* Call-to-Action (CTA) Button */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '14px 32px',
+            borderRadius: '14px',
+            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+            color: '#ffffff',
+            fontSize: 22,
+            fontWeight: 700,
+            boxShadow: '0 10px 25px -5px rgba(99, 102, 241, 0.5)',
+          }}
+        >
+          <span>Try Free Online — markdown2pdf.my.id</span>
+          <span>→</span>
         </div>
       </div>
     ),
