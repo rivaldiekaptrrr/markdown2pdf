@@ -1,6 +1,11 @@
 # Markdown2PDF
 
+[![Live App](https://img.shields.io/badge/Live%20App-markdown2pdf.my.id-6366f1?style=for-the-badge&logo=vercel&logoColor=white)](https://markdown2pdf.my.id)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org)
+[![TypeScript 5](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+
 A professional web application for writing Markdown and exporting beautiful PDFs.
+
 
 ## Features
 

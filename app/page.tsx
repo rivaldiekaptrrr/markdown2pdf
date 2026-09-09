@@ -9,6 +9,7 @@ import PdfSettings, { DEFAULT_SETTINGS, type PaperSettings } from '@/components/
 import { saveDocument, loadLastDocument } from '@/lib/storage/documentStore';
 import type { MarkdownEditorRef } from '@/components/editor/MarkdownEditor';
 import type { MarkdownPreviewRef } from '@/components/preview/MarkdownPreview';
+import SeoContent from '@/components/landing/SeoContent';
 import 'katex/dist/katex.min.css';
 
 // Dynamic imports for heavy components (avoid SSR)
@@ -396,124 +397,129 @@ export default function HomePage() {
   );
 
   return (
-    <div className="flex flex-col" style={{ height: '100vh', background: 'var(--bg-primary)' }}>
-      {/* ===== HEADER ===== */}
-      <header
-        className="flex items-center gap-3 px-4 py-2 flex-shrink-0"
-        style={{
-          background: 'var(--bg-secondary)',
-          borderBottom: '1px solid var(--border)',
-          zIndex: 10,
-          height: 48,
-        }}
-      >
-        {/* Brand */}
-        <div className="flex items-center gap-2 mr-2">
-          <div
-            className="w-7 h-7 rounded-md flex items-center justify-center font-bold text-white text-xs"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}
-          >
-            M
-          </div>
-          <span className="font-bold text-sm hidden sm:block" style={{ color: 'var(--text-primary)' }}>
-            Markdown2PDF
-          </span>
-        </div>
-
-        {/* Title input */}
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="rounded px-2 py-1 text-sm font-medium outline-none focus:ring-1 focus:ring-indigo-500"
+    <div style={{ overflowY: 'auto', height: '100vh' }}>
+      <div className="flex flex-col" style={{ height: '100vh', background: 'var(--bg-primary)' }}>
+        {/* ===== HEADER ===== */}
+        <header
+          className="flex items-center gap-3 px-4 py-2 flex-shrink-0"
           style={{
-            background: 'var(--bg-tertiary)',
-            border: '1px solid var(--border)',
-            color: 'var(--text-primary)',
-            minWidth: 0,
-            width: 160,
+            background: 'var(--bg-secondary)',
+            borderBottom: '1px solid var(--border)',
+            zIndex: 10,
+            height: 48,
           }}
-        />
-
-        <div className="ml-auto flex items-center gap-2">
-          <button
-            onClick={handleNew}
-            title="New document"
-            className="px-2 py-1 rounded text-xs cursor-pointer transition-all hover:brightness-110"
-            style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
-          >
-            New
-          </button>
-          <button
-            onClick={handleOpen}
-            title="Open file"
-            className="px-2 py-1 rounded text-xs cursor-pointer transition-all hover:brightness-110"
-            style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
-          >
-            Open
-          </button>
-          <button
-            onClick={handleExportMd}
-            title="Export Markdown"
-            className="px-2 py-1 rounded text-xs cursor-pointer transition-all hover:brightness-110"
-            style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
-          >
-            .md
-          </button>
-          <button
-            onClick={() => setShowSettings(true)}
-            title="Document settings"
-            className="px-2 py-1 rounded text-xs cursor-pointer transition-all hover:brightness-110"
-            style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
-          >
-            ⚙ Settings
-          </button>
-          <ExportPdfButton getMarkdown={() => markdownRef.current} settings={settings} />
-        </div>
-      </header>
-
-      {/* ===== MOBILE TABS ===== */}
-      {isMobile && (
-        <div
-          className="flex flex-shrink-0"
-          style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)' }}
         >
-          {(['editor', 'preview'] as Tab[]).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className="flex-1 py-2 text-sm font-medium capitalize cursor-pointer transition-all"
-              style={{
-                background: activeTab === tab ? 'var(--bg-surface)' : 'transparent',
-                color: activeTab === tab ? 'var(--text-primary)' : 'var(--text-muted)',
-                borderBottom: activeTab === tab ? '2px solid var(--accent)' : '2px solid transparent',
-              }}
+          {/* Brand */}
+          <div className="flex items-center gap-2 mr-2">
+            <div
+              className="w-7 h-7 rounded-md flex items-center justify-center font-bold text-white text-xs"
+              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}
             >
-              {tab}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* ===== MAIN CONTENT ===== */}
-      <main className="flex-1 overflow-hidden bg-[var(--bg-primary)]">
-        {isMobile ? (
-          <div className="h-full overflow-hidden">
-            {activeTab === 'editor' ? editorPanel : previewPanel}
+              M
+            </div>
+            <span className="font-bold text-sm hidden sm:block" style={{ color: 'var(--text-primary)' }}>
+              Markdown2PDF
+            </span>
           </div>
-        ) : (
-          <ResizablePanel left={editorPanel} right={previewPanel} />
-        )}
-      </main>
 
-      {/* ===== SETTINGS PANEL ===== */}
-      {showSettings && (
-        <PdfSettings
-          settings={settings}
-          onChange={setSettings}
-          onClose={() => setShowSettings(false)}
-        />
-      )}
+          {/* Title input */}
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="rounded px-2 py-1 text-sm font-medium outline-none focus:ring-1 focus:ring-indigo-500"
+            style={{
+              background: 'var(--bg-tertiary)',
+              border: '1px solid var(--border)',
+              color: 'var(--text-primary)',
+              minWidth: 0,
+              width: 160,
+            }}
+          />
+
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={handleNew}
+              title="New document"
+              className="px-2 py-1 rounded text-xs cursor-pointer transition-all hover:brightness-110"
+              style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
+            >
+              New
+            </button>
+            <button
+              onClick={handleOpen}
+              title="Open file"
+              className="px-2 py-1 rounded text-xs cursor-pointer transition-all hover:brightness-110"
+              style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
+            >
+              Open
+            </button>
+            <button
+              onClick={handleExportMd}
+              title="Export Markdown"
+              className="px-2 py-1 rounded text-xs cursor-pointer transition-all hover:brightness-110"
+              style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
+            >
+              .md
+            </button>
+            <button
+              onClick={() => setShowSettings(true)}
+              title="Document settings"
+              className="px-2 py-1 rounded text-xs cursor-pointer transition-all hover:brightness-110"
+              style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
+            >
+              ⚙ Settings
+            </button>
+            <ExportPdfButton getMarkdown={() => markdownRef.current} settings={settings} />
+          </div>
+        </header>
+
+        {/* ===== MOBILE TABS ===== */}
+        {isMobile && (
+          <div
+            className="flex flex-shrink-0"
+            style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)' }}
+          >
+            {(['editor', 'preview'] as Tab[]).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className="flex-1 py-2 text-sm font-medium capitalize cursor-pointer transition-all"
+                style={{
+                  background: activeTab === tab ? 'var(--bg-surface)' : 'transparent',
+                  color: activeTab === tab ? 'var(--text-primary)' : 'var(--text-muted)',
+                  borderBottom: activeTab === tab ? '2px solid var(--accent)' : '2px solid transparent',
+                }}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* ===== MAIN CONTENT ===== */}
+        <main className="flex-1 overflow-hidden bg-[var(--bg-primary)]">
+          {isMobile ? (
+            <div className="h-full overflow-hidden">
+              {activeTab === 'editor' ? editorPanel : previewPanel}
+            </div>
+          ) : (
+            <ResizablePanel left={editorPanel} right={previewPanel} />
+          )}
+        </main>
+
+        {/* ===== SETTINGS PANEL ===== */}
+        {showSettings && (
+          <PdfSettings
+            settings={settings}
+            onChange={setSettings}
+            onClose={() => setShowSettings(false)}
+          />
+        )}
+      </div>
+
+      {/* ===== SEO CONTENT (below editor, visible to Google crawler) ===== */}
+      <SeoContent />
     </div>
   );
 }
