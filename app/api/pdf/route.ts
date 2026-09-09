@@ -13,8 +13,12 @@ const VALID_ORIENTATIONS = ['portrait', 'landscape'] as const;
 // Max markdown size: 2 MB
 const MAX_MARKDOWN_SIZE = 2 * 1024 * 1024;
 
+// Chromium binary remote tar URL for Vercel serverless size limit
+const CHROMIUM_PACK_URL =
+  'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar';
+
 export async function POST(req: NextRequest) {
-  // Rate limiting check (10 exports per 60s per IP)
+  // 1. Rate limiting check (10 exports per 60s per IP)
   const clientIp = getClientIp(req.headers);
   const rateLimit = checkRateLimit(clientIp, { limit: 10, windowSeconds: 60 });
 
@@ -51,7 +55,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400, headers: rateLimitHeaders });
   }
 
-  // Validation
+  // 2. Validasi input
   if (typeof markdown !== 'string' || !markdown.trim()) {
     return NextResponse.json({ error: 'markdown is required' }, { status: 400, headers: rateLimitHeaders });
   }
@@ -65,20 +69,35 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid orientation' }, { status: 400, headers: rateLimitHeaders });
   }
 
+  let browser: any = null;
 
   try {
-    // Dynamically import puppeteer to avoid edge runtime issues
-    const puppeteer = await import('puppeteer');
-    const browser = await puppeteer.default.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--font-render-hinting=none',
-      ],
-    });
+    // 3. Launch browser (Vercel Serverless vs Local)
+    if (process.env.NODE_ENV === 'production') {
+      const chromium = (await import('@sparticuz/chromium-min')).default;
+      const puppeteerCore = (await import('puppeteer-core')).default;
+
+      const executablePath = await chromium.executablePath(CHROMIUM_PACK_URL);
+
+      browser = await puppeteerCore.launch({
+        args: [...chromium.args, '--hide-scrollbars', '--disable-web-security'],
+        defaultViewport: { width: 1200, height: 800 },
+        executablePath,
+        headless: true,
+      });
+    } else {
+      const puppeteer = (await import('puppeteer')).default;
+      browser = await puppeteer.launch({
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-gpu',
+          '--font-render-hinting=none',
+        ],
+      });
+    }
 
     try {
       const page = await browser.newPage();
@@ -94,11 +113,9 @@ export async function POST(req: NextRequest) {
       // Wait for Mermaid rendering script inside Puppeteer page to finish
       await page.waitForFunction(() => (window as any).__MERMAID_DONE__ === true, {
         timeout: 10000,
-      }).catch(() => {
-        // Fallback delay if timeout reached
-      });
+      }).catch(() => { });
 
-      // Extra short delay for layout and SVG rendering to settle
+      // Short delay for layout and SVG rendering to settle
       await new Promise((resolve) => setTimeout(resolve, 300));
 
       const pdfBuffer = await page.pdf({
@@ -135,7 +152,7 @@ export async function POST(req: NextRequest) {
         },
       });
     } catch (innerErr) {
-      await browser.close();
+      if (browser) await browser.close();
       throw innerErr;
     }
   } catch (err) {
